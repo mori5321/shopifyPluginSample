@@ -2,7 +2,7 @@ import dotenv from 'dotenv';
 import Koa from 'koa';
 import next from 'next';
 
-import {verifyRequest} from '@shopify/koa-shopify-auth';
+import { verifyRequest } from '@shopify/koa-shopify-auth';
 import createShopifyAuth from '@shopify/koa-shopify-auth/dist/src/auth';
 import Shopify from '@shopify/shopify-api'
 import {ApiVersion} from '@shopify/shopify-api';
