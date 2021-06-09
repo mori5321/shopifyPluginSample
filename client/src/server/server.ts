@@ -1,8 +1,8 @@
 import dotenv from 'dotenv';
-import Koa from 'koa';
+import Koa, {Context} from 'koa';
 import next from 'next';
 
-import { verifyRequest } from '@shopify/koa-shopify-auth';
+// import { verifyRequest } from '@shopify/koa-shopify-auth';
 import createShopifyAuth from '@shopify/koa-shopify-auth/dist/src/auth';
 import Shopify from '@shopify/shopify-api'
 import {ApiVersion} from '@shopify/shopify-api';
@@ -29,6 +29,11 @@ const handle = app.getRequestHandler();
 
 const ACTIVE_SHOPIFY_SHOPS: any = {}
 
+const getHost = (ctx: Context) => {
+  const baseUrl = new URL(`https://${ctx.request.header.host}${ctx.request.url}`);
+  return baseUrl.searchParams.get("host");  
+};
+
 app.prepare().then(() => {
   const server = new Koa();
   const router = new Router();
@@ -40,7 +45,9 @@ app.prepare().then(() => {
         const {shop, scope} = ctx.state.shopify;
         ACTIVE_SHOPIFY_SHOPS[shop] = scope;
 
-        ctx.redirect(`/`)
+        const host = getHost(ctx);
+
+        ctx.redirect(`/?shop=${shop}&host=${host}`)
       }
     })
   )
@@ -53,11 +60,6 @@ app.prepare().then(() => {
 
   router.get("/", async (ctx) => {
     const shop = ctx.query.shop as string; // FIX type assesion
-    
-    // if (shop === undefined) {
-    //   ctx.redirect(`/`)
-      // return;
-    // }
 
     if (ACTIVE_SHOPIFY_SHOPS[shop] === undefined) {
       ctx.redirect(`/auth?shop=${shop}`);
@@ -68,7 +70,10 @@ app.prepare().then(() => {
 
   router.get("(/_next/static/.*)", handleRequest);
   router.get("/_next/webpack-hmr", handleRequest);
-  router.get("(.*)", verifyRequest(), handleRequest);
+
+  // router.get("(.*)", verifyRequest(), handleRequest);
+  // ↓Patch. But, This is not recommended. SEE: https://github.com/Shopify/koa-shopify-auth/issues/76#issuecomment-805844570
+  router.get("(.*)", handleRequest)
   
   server.use(router.allowedMethods());
   server.use(router.routes());
