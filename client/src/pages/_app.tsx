@@ -6,8 +6,7 @@ import { Provider } from "@shopify/app-bridge-react";
 import translations from "@shopify/polaris/locales/ja.json";
 import "@shopify/polaris/dist/styles.css";
 import { AppConfigV2 } from "@shopify/app-bridge/client";
-import { GetServerSideProps } from "next";
-// import { GetServerSideProps } from "next";
+import ClientRouter from "@/router/clientRouter";
 
 type PageProps = { host: string };
 class MyApp extends App<PageProps> {
@@ -29,6 +28,7 @@ class MyApp extends App<PageProps> {
           <meta charSet="utf-8" />
         </Head>
         <Provider config={config}>
+          <ClientRouter />
           <AppProvider i18n={translations}>
             <Component {...pageProps} />
           </AppProvider>
