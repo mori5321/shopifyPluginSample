@@ -7,6 +7,7 @@ import createShopifyAuth from '@shopify/koa-shopify-auth/dist/src/auth';
 import Shopify from '@shopify/shopify-api'
 import {ApiVersion} from '@shopify/shopify-api';
 import Router from 'koa-router';
+import {verifyRequest} from '@shopify/koa-shopify-auth';
 
 dotenv.config();
 
@@ -41,6 +42,7 @@ app.prepare().then(() => {
 
   server.use(
     createShopifyAuth({
+      accessMode: "online",
       afterAuth(ctx) {
         const {shop, scope} = ctx.state.shopify;
         ACTIVE_SHOPIFY_SHOPS[shop] = scope;
@@ -71,9 +73,9 @@ app.prepare().then(() => {
   router.get("(/_next/static/.*)", handleRequest);
   router.get("/_next/webpack-hmr", handleRequest);
 
-  // router.get("(.*)", verifyRequest(), handleRequest);
+  router.get("(.*)", verifyRequest({ accessMode: "online" }), handleRequest);
   // ↓Patch. But, This is not recommended. SEE: https://github.com/Shopify/koa-shopify-auth/issues/76#issuecomment-805844570
-  router.get("(.*)", handleRequest)
+  // router.get("(.*)", handleRequest)
   
   server.use(router.allowedMethods());
   server.use(router.routes());
