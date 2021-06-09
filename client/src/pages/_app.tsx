@@ -6,9 +6,11 @@ import { Provider } from "@shopify/app-bridge-react";
 import translations from "@shopify/polaris/locales/ja.json";
 import "@shopify/polaris/dist/styles.css";
 import { AppConfigV2 } from "@shopify/app-bridge/client";
+import { GetServerSideProps } from "next";
 // import { GetServerSideProps } from "next";
 
-class MyApp extends App<{ shopOrigin: string; host: string }> {
+type PageProps = { host: string };
+class MyApp extends App<PageProps> {
   render() {
     const { Component, pageProps } = this.props;
 
@@ -44,22 +46,14 @@ MyApp.getInitialProps = async (context: AppContext) => {
     },
   };
 };
-//
-// MyApp.getServerSideProps = async ({ ctx }) => {
-//   return {
-//     shopOrigin: ctx.query.shop,
-//   };
-// };
-//
+// これだと動かない
 // export const getServerSideProps: GetServerSideProps = async (context) => {
 //   console.log("Ctx", context);
 //   return {
 //     props: {
-//       shopOrigin: context.query.shop ?? "",
+//       host: context.query.host ?? "",
 //     },
 //   };
 // };
-//
-// export const getInitialProps: GetInitialProps
 
 export default MyApp;
