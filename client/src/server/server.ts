@@ -60,6 +60,10 @@ app.prepare().then(() => {
     ctx.res.statusCode = 200;
   }
 
+  router.post("/graphql", verifyRequest({returnHeader: true}), async (ctx, _next) => {
+    await Shopify.Utils.graphqlProxy(ctx.req, ctx.res);
+  });
+
   router.get("/", async (ctx) => {
     const shop = ctx.query.shop as string; // FIX type assesion
 
